@@ -1,17 +1,29 @@
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { FlatList, ScrollView, StyleSheet, View } from "react-native";
+import { Button, FlatList, ScrollView, StyleSheet, View } from "react-native";
 import GoalInput from "./components/GoalInput";
 import GoalItem from "./components/GoalItem";
 
 export default function App() {
   const [courseGoals, setCourseGoals] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const startGoalHandler = () => {
+    setIsModalVisible(true);
+  };
 
   const addGoalHandler = (enteredGoal) => {
     setCourseGoals((currentCourseGoals) => [
       ...currentCourseGoals,
       { text: enteredGoal, id: Math.random().toString() },
     ]);
+    setIsModalVisible(false);
   };
+
+  const endAddGoalHandler = () => {
+    setIsModalVisible(false);
+  };
+
   const deleteGoalHandler = (id) => {
     setCourseGoals((currentCourseGoals) => {
       return currentCourseGoals.filter((goal) => goal.id !== id);
@@ -19,30 +31,42 @@ export default function App() {
   };
 
   return (
-    <View style={styles.appContainer}>
-      <GoalInput addGoalHandler={addGoalHandler} />
-      <View style={styles.goalsContainer}>
-        <FlatList
-          data={courseGoals}
-          // key extractor is for extract the id which probably brings the object and convert it to a key
-          keyExtractor={(item, index) => {
-            return item.id;
-          }}
-          renderItem={(itemData) => {
-            return (
-              <GoalItem
-                itemData={itemData}
-                deleteGoalHandler={deleteGoalHandler}
-              />
-            );
-          }}
+    <>
+      <StatusBar style="light" />
+      <View style={styles.appContainer}>
+        <Button
+          title="Add new goal"
+          color={"violet"}
+          onPress={startGoalHandler}
         />
-        {/* flatList allow you to load only the data needed in the view */}
-        {/* <ScrollView> */}
+        <GoalInput
+          isModalVisible={isModalVisible}
+          addGoalHandler={addGoalHandler}
+          endAddGoalHandler={endAddGoalHandler}
+        />
+        <View style={styles.goalsContainer}>
+          <FlatList
+            data={courseGoals}
+            // key extractor is for extract the id which probably brings the object and convert it to a key
+            keyExtractor={(item, index) => {
+              return item.id;
+            }}
+            renderItem={(itemData) => {
+              return (
+                <GoalItem
+                  itemData={itemData}
+                  deleteGoalHandler={deleteGoalHandler}
+                />
+              );
+            }}
+          />
+          {/* flatList allow you to load only the data needed in the view */}
+          {/* <ScrollView> */}
 
-        {/* </ScrollView> */}
+          {/* </ScrollView> */}
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 
